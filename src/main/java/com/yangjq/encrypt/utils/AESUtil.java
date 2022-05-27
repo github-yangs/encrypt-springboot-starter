@@ -24,14 +24,22 @@ public class AESUtil {
   }
 
   /**
+   * 获得加密对象实例
+   * @param key
+   * @return
+   */
+  public static SymmetricCrypto getInstance(String key){
+    return new SymmetricCrypto(SymmetricAlgorithm.AES, Base64.decode(key));
+  }
+
+  /**
    * AES 加密
    * @param key 密钥
    * @param content 待加密的数据
    * @return 加密后的数据
    */
   public static String encrypt(String key, String content){
-    SymmetricCrypto aes = new SymmetricCrypto(SymmetricAlgorithm.AES, Base64.decode(key));
-    return aes.encryptBase64(content);
+    return getInstance(key).encryptBase64(content);
   }
 
   /**
@@ -41,8 +49,18 @@ public class AESUtil {
    * @return 解密后的数据
    */
   public static String decrypt(String key, String encodeData){
-    SymmetricCrypto aes = new SymmetricCrypto(SymmetricAlgorithm.AES, Base64.decode(key));
+    return getInstance(key).decryptStr(encodeData, CharsetUtil.CHARSET_UTF_8);
+  }
+
+  /**
+   * AES 解密
+   * @param aes
+   * @param encodeData
+   * @return
+   */
+  public static String decrypt(SymmetricCrypto aes, String encodeData){
     return aes.decryptStr(encodeData, CharsetUtil.CHARSET_UTF_8);
   }
+
 
 }

@@ -18,19 +18,21 @@ import org.springframework.util.StreamUtils;
  * @Author yangjq
  * @Since 2022/5/25
  *
+ * JSON请求包装类
+ *
  * 1、通的参数可以从request的getParameterMap中获取，而@RequestBody的参数需要从request的InputStream中获取。
  * 2、但是InputStream只能读取一次，如果过滤器读取了参数，后面拦截器和controler层就读取不到参数了。可以把request封装一下，copy一份requet，一个用于在拦截器（过滤器）中读取参数，一个放行给controller使用
  * 3、修改request的body 的重点在于重写request的 getInputStream 这样在controller中@RequestBody时获取就是我们自定义的body值了
  */
 @Slf4j
-public class EncryptedRequestWrapper extends HttpServletRequestWrapper {
+public class JsonRequestWrapper extends HttpServletRequestWrapper {
 
   /**
    * 请求体
    */
   private String requestBody;
 
-  public EncryptedRequestWrapper(HttpServletRequest request) {
+  public JsonRequestWrapper(HttpServletRequest request) {
     super(request);
     try {
       ByteArrayOutputStream cachedBytes = new ByteArrayOutputStream();

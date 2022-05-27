@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
  * @Since 2022/5/26
  */
 @ControllerAdvice
-public class EncryptResponse implements ResponseBodyAdvice {
+public class EncryptResponseAdvice implements ResponseBodyAdvice {
 
   @Override
   public boolean supports(MethodParameter returnType, Class converterType) {
