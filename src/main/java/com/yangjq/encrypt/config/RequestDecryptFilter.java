@@ -1,7 +1,6 @@
 package com.yangjq.encrypt.config;
 
-import cn.hutool.crypto.symmetric.SymmetricCrypto;
-import com.yangjq.encrypt.utils.AESUtil;
+import com.yangjq.encrypt.utils.AesUtil;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,13 +18,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 
 /**
  * @Author yangjq
  * @Since 2022/5/26
+ *
+ * filterName = "ZZFilter" ： filter排序按照字母排序，因此让该filter放最后
  */
 @Slf4j
-@WebFilter(urlPatterns = "/*")
+@WebFilter(filterName = "ZZFilter", urlPatterns = "/*")
 @RequiredArgsConstructor
 public class RequestDecryptFilter implements Filter {
 
@@ -43,12 +45,14 @@ public class RequestDecryptFilter implements Filter {
     HttpServletRequest request = (HttpServletRequest) servletRequest;
     HttpServletResponse response = (HttpServletResponse) servletResponse;
 
+    //获取密钥
+    String aesKey = configAdapter.getAesKey(request, response);
+    request.setAttribute(CryptoConfigAdapter.AES_KEY, aesKey);
+
     String encrypt = request.getHeader(AES_HEADER);
     String contentType = request.getContentType();
     String method = request.getMethod();
     String url = request.getRequestURL().toString();
-
-    Map<String, String[]> parameterMap = request.getParameterMap();
 
     //判断是否需要解密，不需要直接返回
     if (!"true".equalsIgnoreCase(encrypt)){
@@ -58,8 +62,7 @@ public class RequestDecryptFilter implements Filter {
 
     if (!HttpMethod.POST.toString().equalsIgnoreCase(method)){
       log.error("URL: {} 解密失败! 暂不支持除了POST方法以外的解密", url);
-      filterChain.doFilter(request,response);
-      return;
+      throw new HttpRequestMethodNotSupportedException(method, "解密失败! 暂不支持除了POST方法以外的解密");
     }
 
     if (MediaType.APPLICATION_JSON_VALUE.equalsIgnoreCase(contentType)){
@@ -70,7 +73,7 @@ public class RequestDecryptFilter implements Filter {
       //获得加密的请求体
       String encryptData = encryptedRequestWrapper.getRequestBody();
       //解密
-      String decryptData = AESUtil.decrypt(configAdapter.getAesKey(), encryptData);
+      String decryptData = AesUtil.decrypt(encryptData, aesKey);
       //重新放入请求中
       encryptedRequestWrapper.setRequestBody(decryptData);
       filterChain.doFilter(encryptedRequestWrapper,response);
@@ -83,7 +86,7 @@ public class RequestDecryptFilter implements Filter {
       //获得加密的参数
       Map<String, String[]> encryptParamMap = formRequestWrapper.getParameterMap();
       //解密
-      Map<String, String[]> decryptParamMap = decryptParams(encryptParamMap);
+      Map<String, String[]> decryptParamMap = decryptParams(encryptParamMap, aesKey);
       //重新放入请求中
       formRequestWrapper.setParametrMap(decryptParamMap);
       filterChain.doFilter(formRequestWrapper, response);
@@ -94,11 +97,10 @@ public class RequestDecryptFilter implements Filter {
 
   }
 
-  private Map<String, String[]> decryptParams(Map<String, String[]> encryptParamMap){
+  private Map<String, String[]> decryptParams(Map<String, String[]> encryptParamMap, String aesKey){
     Map<String, String[]> params = new HashMap<>(encryptParamMap.size()*2);
-    SymmetricCrypto instance = AESUtil.getInstance(configAdapter.getAesKey());
     encryptParamMap.forEach((key, value) -> {
-      String[] decryptData = Arrays.stream(value).map(item -> AESUtil.decrypt(instance, item)).toArray(String[]::new);
+      String[] decryptData = Arrays.stream(value).map(item -> AesUtil.decrypt(item, aesKey)).toArray(String[]::new);
       params.put(key, decryptData);
     });
     return params;
