@@ -1,13 +1,8 @@
 package com.yangjq.encrypt.config;
 
-import cn.hutool.crypto.symmetric.SymmetricCrypto;
-import com.yangjq.encrypt.utils.AESUtil;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;

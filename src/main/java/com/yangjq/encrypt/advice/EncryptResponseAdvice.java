@@ -2,8 +2,9 @@ package com.yangjq.encrypt.advice;
 
 import cn.hutool.json.JSONUtil;
 import com.yangjq.encrypt.annotation.EncryptAnno;
+import com.yangjq.encrypt.config.CryptoConfigAdapter;
 import com.yangjq.encrypt.utils.AESUtil;
-import com.yangjq.encrypt.utils.RedisUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.ServerHttpRequest;
@@ -16,7 +17,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
  * @Since 2022/5/26
  */
 @ControllerAdvice
+@RequiredArgsConstructor
 public class EncryptResponseAdvice implements ResponseBodyAdvice {
+
+  private final CryptoConfigAdapter configAdapter;
 
   @Override
   public boolean supports(MethodParameter returnType, Class converterType) {
@@ -27,7 +31,9 @@ public class EncryptResponseAdvice implements ResponseBodyAdvice {
   public Object beforeBodyWrite(Object body, MethodParameter returnType,
       MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request,
       ServerHttpResponse response) {
+    //获取AES密钥
 
-    return AESUtil.encrypt(RedisUtil.getKey("1"), JSONUtil.toJsonStr(body));
+    return AESUtil.encrypt(configAdapter.getAesKey(), JSONUtil.toJsonStr(body));
   }
+
 }

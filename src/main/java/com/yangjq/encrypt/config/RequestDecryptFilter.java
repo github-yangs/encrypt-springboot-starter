@@ -2,15 +2,10 @@ package com.yangjq.encrypt.config;
 
 import cn.hutool.crypto.symmetric.SymmetricCrypto;
 import com.yangjq.encrypt.utils.AESUtil;
-import com.yangjq.encrypt.utils.RedisUtil;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -20,10 +15,10 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * @Author yangjq
@@ -31,7 +26,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 @Slf4j
 @WebFilter(urlPatterns = "/*")
+@RequiredArgsConstructor
 public class RequestDecryptFilter implements Filter {
+
+  private final CryptoConfigAdapter configAdapter;
 
   /**
    * 用于判断是否需要解密的HEADER参数
@@ -72,7 +70,7 @@ public class RequestDecryptFilter implements Filter {
       //获得加密的请求体
       String encryptData = encryptedRequestWrapper.getRequestBody();
       //解密
-      String decryptData = AESUtil.decrypt(RedisUtil.getKey("1"), encryptData);
+      String decryptData = AESUtil.decrypt(configAdapter.getAesKey(), encryptData);
       //重新放入请求中
       encryptedRequestWrapper.setRequestBody(decryptData);
       filterChain.doFilter(encryptedRequestWrapper,response);
@@ -98,7 +96,7 @@ public class RequestDecryptFilter implements Filter {
 
   private Map<String, String[]> decryptParams(Map<String, String[]> encryptParamMap){
     Map<String, String[]> params = new HashMap<>(encryptParamMap.size()*2);
-    SymmetricCrypto instance = AESUtil.getInstance(RedisUtil.getKey("1"));
+    SymmetricCrypto instance = AESUtil.getInstance(configAdapter.getAesKey());
     encryptParamMap.forEach((key, value) -> {
       String[] decryptData = Arrays.stream(value).map(item -> AESUtil.decrypt(instance, item)).toArray(String[]::new);
       params.put(key, decryptData);
