@@ -21,8 +21,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 
 /**
- * @Author yangjq
- * @Since 2022/5/26
+ * @author yangjq
+ * @since 2022/5/26
  *
  * filterName = "ZZFilter" ： filter排序按照字母排序，因此让该filter放最后
  */
@@ -77,7 +77,6 @@ public class RequestDecryptFilter implements Filter {
       //重新放入请求中
       encryptedRequestWrapper.setRequestBody(decryptData);
       filterChain.doFilter(encryptedRequestWrapper,response);
-
     }else if (MediaType.APPLICATION_FORM_URLENCODED_VALUE.equalsIgnoreCase(contentType)){
       //如果是Form(表单提交)
 
