@@ -11,7 +11,9 @@ import java.security.SecureRandom;
 import java.util.Random;
 
 /**
+ * @author huanzi
  * AES加、解密算法工具类
+ * modifier: yangjq
  */
 public class AesUtil {
   /**
@@ -36,15 +38,6 @@ public class AesUtil {
    * JceSecurity.getVerificationResult 会将其put进 private static final Map<Provider,Object>中，导致内存缓便被耗尽
    */
   private static final BouncyCastleProvider PROVIDER = new BouncyCastleProvider();
-
-  /**
-   * 后端AES的key，由静态代码块赋值
-   */
-  public static String key;
-
-  static {
-    key = getKey();
-  }
 
   /**
    * 获取key
