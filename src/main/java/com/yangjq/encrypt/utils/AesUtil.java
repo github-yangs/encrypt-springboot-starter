@@ -1,14 +1,13 @@
 package com.yangjq.encrypt.utils;
 
-import lombok.SneakyThrows;
-import org.apache.tomcat.util.codec.binary.Base64;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Random;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import lombok.SneakyThrows;
+import org.apache.tomcat.util.codec.binary.Base64;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  * @author huanzi
@@ -16,6 +15,7 @@ import java.util.Random;
  * modifier: yangjq
  */
 public class AesUtil {
+
   /**
    * 加密算法AES
    */

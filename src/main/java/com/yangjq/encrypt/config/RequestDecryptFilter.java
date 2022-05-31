@@ -87,7 +87,7 @@ public class RequestDecryptFilter implements Filter {
       //解密
       Map<String, String[]> decryptParamMap = decryptParams(encryptParamMap, aesKey);
       //重新放入请求中
-      formRequestWrapper.setParametrMap(decryptParamMap);
+      formRequestWrapper.setParameterMap(decryptParamMap);
       filterChain.doFilter(formRequestWrapper, response);
     }else {
       log.error("请求：{} 传入了不支持的解密类型", url);

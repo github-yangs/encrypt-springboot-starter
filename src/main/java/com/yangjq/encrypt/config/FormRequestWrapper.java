@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @Author yangjq
- * @Since 2022/5/27
+ * @author yangjq
+ * @since 2022/5/27
  *
  * From请求包装类
  */
@@ -24,11 +24,11 @@ public class FormRequestWrapper extends HttpServletRequestWrapper {
 
   /**
    * Constructs a request object wrapping the given request.
-   *
+   * package-private：该方法一般只在请求Filter中使用
    * @param request The request to wrap
    * @throws IllegalArgumentException if the request is null
    */
-  public FormRequestWrapper(HttpServletRequest request) {
+  FormRequestWrapper(HttpServletRequest request) {
     super(request);
     this.params.putAll(request.getParameterMap());
   }
@@ -58,7 +58,11 @@ public class FormRequestWrapper extends HttpServletRequestWrapper {
     return params.get(name);
   }
 
-  public void setParametrMap(Map<String, String[]> params) {
+  /**
+   * 包私有：package-private
+   * @param params
+   */
+  void setParameterMap(Map<String, String[]> params) {
     this.params = params;
   }
 }
